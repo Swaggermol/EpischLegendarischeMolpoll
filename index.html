@@ -1,39 +1,485 @@
+
 <!DOCTYPE html>
 <html lang="nl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>De Episch-Legendarische Molpoll 2027 ©</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#17152d">
+
+  <title>De Episch-Legendarische Molpoll 2027 ©</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      padding: 24px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: Arial, sans-serif;
+      color: #f8f5ff;
+      background:
+        radial-gradient(ellipse at top, #443064 0%, transparent 60%),
+        #17152d;
+    }
+
+    .kaart {
+      width: 100%;
+      max-width: 470px;
+      padding: 32px;
+      border: 1px solid #51446c;
+      border-radius: 20px;
+      background: rgba(30, 27, 52, 0.96);
+      box-shadow: 0 18px 55px rgba(0, 0, 0, 0.3);
+    }
+
+    .logo {
+      text-align: center;
+      font-size: 42px;
+      margin-bottom: 12px;
+    }
+
+    h1 {
+      margin: 0 0 16px;
+      text-align: center;
+      font-size: 27px;
+      line-height: 1.25;
+    }
+
+    .welkom {
+      color: #d7cce9;
+      line-height: 1.6;
+      text-align: center;
+      margin-bottom: 26px;
+    }
+
+    .tabs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 24px;
+    }
+
+    button,
+    input {
+      font: inherit;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    .tab {
+      padding: 12px 8px;
+      border: 1px solid #635477;
+      border-radius: 10px;
+      color: #eee7fa;
+      background: #29243e;
+    }
+
+    .tab.actief {
+      color: #21172d;
+      background: #e7c978;
+      border-color: #e7c978;
+      font-weight: bold;
+    }
+
+    .veld {
+      margin-bottom: 16px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 7px;
+      font-size: 14px;
+      font-weight: bold;
+    }
+
+    input {
+      width: 100%;
+      padding: 13px;
+      border: 1px solid #655878;
+      border-radius: 9px;
+      color: white;
+      background: #17152d;
+    }
+
+    input:focus {
+      outline: 2px solid #e7c978;
+      outline-offset: 1px;
+    }
+
+    .hint {
+      display: block;
+      margin-top: 6px;
+      color: #bdb1cf;
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .primair {
+      width: 100%;
+      margin-top: 6px;
+      padding: 14px;
+      border: 0;
+      border-radius: 10px;
+      color: #21172d;
+      background: #e7c978;
+      font-weight: bold;
+    }
+
+    .primair:hover {
+      background: #f2d995;
+    }
+
+    .primair:disabled {
+      cursor: wait;
+      opacity: 0.65;
+    }
+
+    #melding {
+      display: none;
+      margin-top: 18px;
+      padding: 12px;
+      border-radius: 9px;
+      line-height: 1.5;
+      overflow-wrap: anywhere;
+    }
+
+    #melding.zichtbaar {
+      display: block;
+    }
+
+    #melding.succes {
+      color: #d8ffe3;
+      background: #1c4435;
+    }
+
+    #melding.fout {
+      color: #ffe0e0;
+      background: #572b38;
+    }
+
+    .voetnoot {
+      margin-top: 24px;
+      color: #bdb1cf;
+      text-align: center;
+      font-size: 12px;
+      line-height: 1.6;
+    }
+
+    @media (max-width: 420px) {
+      .kaart {
+        padding: 24px 19px;
+      }
+
+      h1 {
+        font-size: 24px;
+      }
+    }
+  </style>
 </head>
 
 <body>
+  <main class="kaart">
+    <div class="logo" aria-hidden="true">🕵️</div>
 
     <h1>De Episch-Legendarische Molpoll 2027 ©</h1>
 
-    <p>
-        Welkom Speurder.
+    <p class="welkom">
+      Welkom, Speurder!<br>
+      De Swaggermol heet je welkom bij een nieuw seizoen vol
+      verdachtmakingen, theorieën en Episch-Legendarische intriges.
+      Maak een account aan of meld je aan om het spel te betreden.
     </p>
 
-    <p>
-        Dit is de officiële thuisbasis van De Episch-Legendarische Molpoll 2027 ©.
+    <div class="tabs">
+      <button type="button" class="tab actief" id="tabAanmelden">
+        Aanmelden
+      </button>
+      <button type="button" class="tab" id="tabRegistreren">
+        Account maken
+      </button>
+    </div>
+
+    <form id="authForm">
+      <div class="veld" id="gebruikersnaamVeld" hidden>
+        <label for="username">Gebruikersnaam *</label>
+        <input
+          id="username"
+          name="username"
+          type="text"
+          autocomplete="username"
+          minlength="3"
+          maxlength="30"
+          pattern="[A-Za-z0-9_-]+"
+          placeholder="Kies een gebruikersnaam"
+        >
+        <span class="hint">
+          Minstens 3 tekens. Gebruik letters, cijfers, _ of -.
+          Je gebruikersnaam is bedoeld om vast te blijven.
+        </span>
+      </div>
+
+      <div class="veld" id="voornaamVeld" hidden>
+        <label for="first_name">Voornaam (optioneel)</label>
+        <input
+          id="first_name"
+          name="first_name"
+          type="text"
+          autocomplete="given-name"
+          maxlength="60"
+          placeholder="Hoe mogen we je noemen?"
+        >
+      </div>
+
+      <div class="veld">
+        <label for="email">E-mailadres *</label>
+        <input
+          id="email"
+          name="email"
+          type="email"
+          autocomplete="email"
+          required
+          placeholder="jij@voorbeeld.be"
+        >
+      </div>
+
+      <div class="veld">
+        <label for="password">Wachtwoord *</label>
+        <input
+          id="password"
+          name="password"
+          type="password"
+          autocomplete="current-password"
+          minlength="8"
+          required
+          placeholder="Minstens 8 tekens"
+        >
+      </div>
+
+      <div class="veld" id="bevestigWachtwoordVeld" hidden>
+        <label for="passwordConfirm">Wachtwoord bevestigen *</label>
+        <input
+          id="passwordConfirm"
+          name="passwordConfirm"
+          type="password"
+          autocomplete="new-password"
+          minlength="8"
+          placeholder="Typ je wachtwoord opnieuw"
+        >
+      </div>
+
+      <button class="primair" id="verzendKnop" type="submit">
+        Aanmelden
+      </button>
+
+      <div id="melding" role="status" aria-live="polite"></div>
+    </form>
+
+    <div id="ingelogdPaneel" hidden>
+      <p class="welkom" id="ingelogdTekst"></p>
+      <button type="button" class="primair" id="afmeldenKnop">
+        Afmelden
+      </button>
+    </div>
+
+    <p class="voetnoot">
+      Alleen geregistreerde Speurders krijgen toegang tot het spel.
+      Speuren doe je samen; vertrouwen moet je verdienen.
     </p>
+  </main>
 
-    <h2>Navigatie</h2>
+  <script type="module">
+    import { supabase } from './supabase.js';
 
-    <ul>
-        <li>Home</li>
-        <li>Kandidaten</li>
-        <li>Klassement</li>
-        <li>Forum</li>
-        <li>Reglement</li>
-        <li>Inloggen</li>
-    </ul>
+    const form = document.getElementById('authForm');
+    const tabAanmelden = document.getElementById('tabAanmelden');
+    const tabRegistreren = document.getElementById('tabRegistreren');
+    const gebruikersnaamVeld = document.getElementById('gebruikersnaamVeld');
+    const voornaamVeld = document.getElementById('voornaamVeld');
+    const bevestigVeld = document.getElementById('bevestigWachtwoordVeld');
+    const username = document.getElementById('username');
+    const firstName = document.getElementById('first_name');
+    const email = document.getElementById('email');
+    const password = document.getElementById('password');
+    const passwordConfirm = document.getElementById('passwordConfirm');
+    const verzendKnop = document.getElementById('verzendKnop');
+    const melding = document.getElementById('melding');
+    const ingelogdPaneel = document.getElementById('ingelogdPaneel');
+    const ingelogdTekst = document.getElementById('ingelogdTekst');
 
-    <hr>
+    let modus = 'aanmelden';
 
-    <p>
-        Georganiseerd door De Swaggermol.
-    </p>
+    function toonMelding(tekst, type) {
+      melding.textContent = tekst;
+      melding.className = `zichtbaar ${type}`;
+    }
 
+    function wisMelding() {
+      melding.textContent = '';
+      melding.className = '';
+    }
+
+    function veranderModus(nieuweModus) {
+      modus = nieuweModus;
+      const registreren = modus === 'registreren';
+
+      gebruikersnaamVeld.hidden = !registreren;
+      voornaamVeld.hidden = !registreren;
+      bevestigVeld.hidden = !registreren;
+
+      username.required = registreren;
+      passwordConfirm.required = registreren;
+
+      password.autocomplete = registreren
+        ? 'new-password'
+        : 'current-password';
+
+      tabAanmelden.classList.toggle('actief', !registreren);
+      tabRegistreren.classList.toggle('actief', registreren);
+
+      verzendKnop.textContent = registreren
+        ? 'Account aanmaken'
+        : 'Aanmelden';
+
+      wisMelding();
+    }
+
+    tabAanmelden.addEventListener('click', () => {
+      veranderModus('aanmelden');
+    });
+
+    tabRegistreren.addEventListener('click', () => {
+      veranderModus('registreren');
+    });
+
+    function toonIngelogdeGebruiker(session) {
+      const ingelogd = Boolean(session);
+
+      form.hidden = ingelogd;
+      tabAanmelden.hidden = ingelogd;
+      tabRegistreren.hidden = ingelogd;
+      ingelogdPaneel.hidden = !ingelogd;
+
+      if (ingelogd) {
+        const naam =
+          session.user.user_metadata?.username ||
+          session.user.email ||
+          'Speurder';
+
+        ingelogdTekst.textContent =
+          `Je bent aangemeld als ${naam}. Welkom terug, Speurder!`;
+      }
+    }
+
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      wisMelding();
+
+      const ingevuldEmail = email.value.trim();
+      const ingevuldWachtwoord = password.value;
+
+      verzendKnop.disabled = true;
+
+      try {
+        if (modus === 'registreren') {
+          const ingevuldeGebruikersnaam = username.value.trim();
+          const ingevuldeVoornaam = firstName.value.trim();
+
+          if (!/^[A-Za-z0-9_-]{3,30}$/.test(ingevuldeGebruikersnaam)) {
+            throw new Error(
+              'Kies een gebruikersnaam van 3 tot 30 tekens, met alleen letters, cijfers, _ of -.'
+            );
+          }
+
+          if (ingevuldWachtwoord.length < 8) {
+            throw new Error(
+              'Je wachtwoord moet minstens 8 tekens bevatten.'
+            );
+          }
+
+          if (ingevuldWachtwoord !== passwordConfirm.value) {
+            throw new Error(
+              'De twee wachtwoorden zijn niet hetzelfde.'
+            );
+          }
+
+          const { data, error } = await supabase.auth.signUp({
+            email: ingevuldEmail,
+            password: ingevuldWachtwoord,
+            options: {
+              data: {
+                username: ingevuldeGebruikersnaam,
+                first_name: ingevuldeVoornaam || null
+              }
+            }
+          });
+
+          if (error) throw error;
+
+          if (data.session) {
+            toonMelding(
+              'Je account is aangemaakt en je bent aangemeld. Welkom, Speurder!',
+              'succes'
+            );
+            toonIngelogdeGebruiker(data.session);
+          } else {
+            toonMelding(
+              'Je registratie is ontvangen. Controleer je e-mail om je account te bevestigen voordat je je aanmeldt.',
+              'succes'
+            );
+          }
+        } else {
+          const { data, error } = await supabase.auth.signInWithPassword({
+            email: ingevuldEmail,
+            password: ingevuldWachtwoord
+          });
+
+          if (error) throw error;
+
+          toonIngelogdeGebruiker(data.session);
+          toonMelding('Je bent succesvol aangemeld.', 'succes');
+        }
+      } catch (error) {
+        let tekst = error.message || 'Er is iets misgegaan.';
+
+        if (
+          tekst.toLowerCase().includes('duplicate key') ||
+          tekst.toLowerCase().includes('profiles_username_lower_unique')
+        ) {
+          tekst = 'Deze gebruikersnaam is al in gebruik. Kies een andere.';
+        }
+
+        toonMelding(tekst, 'fout');
+      } finally {
+        verzendKnop.disabled = false;
+      }
+    });
+
+    document.getElementById('afmeldenKnop').addEventListener('click', async () => {
+      const { error } = await supabase.auth.signOut();
+
+      if (error) {
+        toonMelding('Afmelden is niet gelukt: ' + error.message, 'fout');
+        return;
+      }
+
+      toonIngelogdeGebruiker(null);
+      veranderModus('aanmelden');
+      toonMelding('Je bent afgemeld.', 'succes');
+    });
+
+    const { data: { session } } = await supabase.auth.getSession();
+    toonIngelogdeGebruiker(session);
+
+    supabase.auth.onAuthStateChange((_event, session) => {
+      toonIngelogdeGebruiker(session);
+    });
+  </script>
 </body>
 </html>

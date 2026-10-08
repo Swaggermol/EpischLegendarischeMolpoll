@@ -419,6 +419,132 @@ const profielGebruikersnaam = document.getElementById('profielGebruikersnaam');
 const profielVoornaam = document.getElementById('profielVoornaam');
 const profielAvatar = document.getElementById('profielAvatar');
 const profielMelding = document.getElementById('profielMelding');
+    
+const stemRondeInfo = document.getElementById('stemRondeInfo');
+const molstemForm = document.getElementById('molstemForm');
+const molKandidaat = document.getElementById('molKandidaat');
+const molstemKnop = document.getElementById('molstemKnop');
+const molstemMelding = document.getElementById('molstemMelding');
+
+let actieveAfleveringId = null;
+
+function toonMolstemMelding(tekst, succes = false) {
+  molstemMelding.textContent = tekst;
+  molstemMelding.className = succes
+    ? 'zichtbaar succes'
+    : 'zichtbaar fout';
+}
+
+async function laadMolstem() {
+  actieveAfleveringId = null;
+  molstemForm.hidden = true;
+  molKandidaat.replaceChildren();
+  molstemMelding.textContent = '';
+  molstemMelding.className = '';
+  stemRondeInfo.textContent = 'De beschikbare stemronde wordt opgehaald...';
+
+  try {
+    const { data: rondes, error: rondeFout } =
+      await supabase.rpc('get_open_episode');
+
+    if (rondeFout) throw rondeFout;
+
+    if (!rondes || rondes.length === 0) {
+      stemRondeInfo.textContent =
+        'Er is momenteel geen open stemronde. Kom later terug, Speurder!';
+      return;
+    }
+
+    const ronde = rondes[0];
+    actieveAfleveringId = ronde.episode_id;
+
+    const { data: kandidaten, error: kandidatenFout } =
+      await supabase.rpc('get_vote_candidates', {
+        p_episode_id: actieveAfleveringId
+      });
+
+    if (kandidatenFout) throw kandidatenFout;
+
+    if (!kandidaten || kandidaten.length === 0) {
+      stemRondeInfo.textContent =
+        'Er zijn nog geen beschikbare kandidaten voor deze stemronde.';
+      return;
+    }
+
+    const deadline = new Date(ronde.voting_deadline);
+
+    stemRondeInfo.textContent =
+      `${ronde.title || `Aflevering ${ronde.episode_number}`} — stemmen kan tot ${deadline.toLocaleString('nl-BE')}.`;
+
+    const eersteOptie = document.createElement('option');
+    eersteOptie.value = '';
+    eersteOptie.textContent = 'Kies een kandidaat...';
+    molKandidaat.appendChild(eersteOptie);
+
+    for (const kandidaat of kandidaten) {
+      const optie = document.createElement('option');
+      optie.value = kandidaat.id;
+      optie.textContent = kandidaat.name;
+      molKandidaat.appendChild(optie);
+    }
+
+    const { data: eigenStem, error: stemFout } = await supabase
+      .from('votes')
+      .select('mol_candidate_id')
+      .eq('episode_id', actieveAfleveringId)
+      .maybeSingle();
+
+    if (stemFout) throw stemFout;
+
+    if (eigenStem?.mol_candidate_id) {
+      const bestaandeOptie = [...molKandidaat.options].find(
+        optie => optie.value === eigenStem.mol_candidate_id
+      );
+
+      if (bestaandeOptie) {
+        molKandidaat.value = eigenStem.mol_candidate_id;
+      }
+    }
+
+    molstemForm.hidden = false;
+  } catch (error) {
+    actieveAfleveringId = null;
+    stemRondeInfo.textContent =
+      'De stemronde kon niet worden geladen.';
+    toonMolstemMelding(
+      error.message || 'Er is iets misgegaan bij het ophalen van de stemronde.'
+    );
+  }
+}
+
+molstemForm.addEventListener('submit', async (event) => {
+  event.preventDefault();
+
+  if (!actieveAfleveringId || !molKandidaat.value) {
+    toonMolstemMelding('Kies eerst een kandidaat.');
+    return;
+  }
+
+  molstemKnop.disabled = true;
+
+  try {
+    const { error } = await supabase.rpc('submit_mol_vote', {
+      p_episode_id: actieveAfleveringId,
+      p_candidate_id: molKandidaat.value
+    });
+
+    if (error) throw error;
+
+    toonMolstemMelding('Je Molstem is opgeslagen!', true);
+  } catch (error) {
+    toonMolstemMelding(
+      error.message || 'Je Molstem kon niet worden opgeslagen.'
+    );
+  } finally {
+    molstemKnop.disabled = false;
+  }
+});
+
 
 function toonProfielMelding(tekst, succes) {
   profielMelding.textContent = tekst;

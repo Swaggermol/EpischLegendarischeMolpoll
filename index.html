@@ -347,6 +347,90 @@
     const ingelogdPaneel = document.getElementById('ingelogdPaneel');
     const ingelogdTekst = document.getElementById('ingelogdTekst');
 
+const profielForm = document.getElementById('profielForm');
+const profielGebruikersnaam = document.getElementById('profielGebruikersnaam');
+const profielVoornaam = document.getElementById('profielVoornaam');
+const profielAvatar = document.getElementById('profielAvatar');
+const profielMelding = document.getElementById('profielMelding');
+
+function toonProfielMelding(tekst, succes) {
+  profielMelding.textContent = tekst;
+  profielMelding.className = succes
+    ? 'zichtbaar succes'
+    : 'zichtbaar fout';
+}
+
+async function laadProfiel() {
+  const { data: { user }, error: gebruikerFout } =
+    await supabase.auth.getUser();
+
+  if (gebruikerFout || !user) {
+    toonProfielMelding('Je sessie kon niet worden opgehaald.', false);
+    return;
+  }
+
+  const { data, error } = await supabase
+    .from('profiles')
+    .select('username, first_name, avatar_url')
+    .eq('id', user.id)
+    .single();
+
+  if (error) {
+    toonProfielMelding(
+      'Je profiel kon niet worden geladen. ' + error.message,
+      false
+    );
+    return;
+  }
+
+  profielGebruikersnaam.value = data.username || '';
+  profielVoornaam.value = data.first_name || '';
+  profielAvatar.value = data.avatar_url || '';
+}
+
+profielForm.addEventListener('submit', async (event) => {
+  event.preventDefault();
+
+  const { data: { user }, error: gebruikerFout } =
+    await supabase.auth.getUser();
+
+  if (gebruikerFout || !user) {
+    toonProfielMelding('Meld je opnieuw aan om je profiel op te slaan.', false);
+    return;
+  }
+
+  const avatar = profielAvatar.value.trim();
+
+  if (avatar && !/^https?:\/\//i.test(avatar)) {
+    toonProfielMelding('De avatar moet een geldige http- of https-link zijn.', false);
+    return;
+  }
+
+  const knop = document.getElementById('profielOpslaan');
+  knop.disabled = true;
+
+  try {
+    const { error } = await supabase
+      .from('profiles')
+      .update({
+        first_name: profielVoornaam.value.trim() || null,
+        avatar_url: avatar || null
+      })
+      .eq('id', user.id);
+
+    if (error) throw error;
+
+    toonProfielMelding('Je profiel is opgeslagen.', true);
+  } catch (error) {
+    toonProfielMelding(
+      'Opslaan is niet gelukt: ' + error.message,
+      false
+    );
+  } finally {
+    knop.disabled = false;
+  }
+});
+
     let modus = 'aanmelden';
 
     function toonMelding(tekst, type) {

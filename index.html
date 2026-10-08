@@ -597,7 +597,8 @@ profielForm.addEventListener('submit', async (event) => {
    
 const { data: { session } } = await supabase.auth.getSession();
 toonIngelogdeGebruiker(session);
-
+await laadProfiel();
+    
 if (session) {
   await laadProfiel();
 }
@@ -605,6 +606,7 @@ if (session) {
 
     supabase.auth.onAuthStateChange((_event, session) => {
       toonIngelogdeGebruiker(session);
+      await laadProfiel();
     });
   </script>
 </body>

@@ -413,11 +413,13 @@
             email: ingevuldEmail,
             password: ingevuldWachtwoord,
             options: {
-              data: {
-                username: ingevuldeGebruikersnaam,
-                first_name: ingevuldeVoornaam || null
-              }
-            }
+  emailRedirectTo: window.location.origin +
+    window.location.pathname,
+  data: {
+    username: ingevuldeGebruikersnaam,
+    first_name: ingevuldeVoornaam || null
+  }
+}
           });
 
           if (error) throw error;

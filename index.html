@@ -281,7 +281,41 @@
       <div id="melding" role="status" aria-live="polite"></div>
     </form>
 
-    <div id="ingelogdPaneel" hidden>
+    
+<div id="ingelogdPaneel" hidden>
+  <h2>Jouw Speurderprofiel</h2>
+  <p id="ingelogdTekst" class="welkom"></p>
+
+  <div class="veld">
+    <label for="profielGebruikersnaam">Gebruikersnaam</label>
+    <input id="profielGebruikersnaam" type="text" readonly>
+    <span class="hint">Je vaste gebruikersnaam kan je hier niet wijzigen.</span>
+  </div>
+
+  <form id="profielForm">
+    <div class="veld">
+      <label for="profielVoornaam">Voornaam (optioneel)</label>
+      <input id="profielVoornaam" type="text" maxlength="60">
+    </div>
+
+    <div class="veld">
+      <label for="profielAvatar">Avatar-URL (optioneel)</label>
+      <input id="profielAvatar" type="url" placeholder="https://...">
+      <span class="hint">Een rechtstreekse afbeeldingslink kan later als profielfoto dienen.</span>
+    </div>
+
+    <button class="primair" id="profielOpslaan" type="submit">
+      Profiel opslaan
+    </button>
+  </form>
+
+  <div id="profielMelding" role="status" aria-live="polite"></div>
+
+  <button type="button" class="primair" id="afmeldenKnop">
+    Afmelden
+  </button>
+</div>
+
       <p class="welkom" id="ingelogdTekst"></p>
       <button type="button" class="primair" id="afmeldenKnop">
         Afmelden

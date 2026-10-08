@@ -314,10 +314,30 @@
     theorieën en de strijd om de Episch-Legendarische overwinning.
   </p>
 
-  <div class="dashboardKaart">
-    <h3>Stemmen</h3>
-    <p>De stemronde verschijnt hier zodra de spelronde beschikbaar is.</p>
-  </div>
+  
+<div class="dashboardKaart" id="molstemKaart">
+  <h3>🎯 Mijn Molstem</h3>
+
+  <p id="stemRondeInfo">
+    De beschikbare stemronde wordt opgehaald...
+  </p>
+
+  <form id="molstemForm" hidden>
+    <div class="veld">
+      <label for="molKandidaat">Wie verdenk jij als Mol?</label>
+      <select id="molKandidaat" required>
+        <option value="">Kies een kandidaat...</option>
+      </select>
+    </div>
+
+    <button class="primair" id="molstemKnop" type="submit">
+      Molstem opslaan
+    </button>
+  </form>
+
+  <div id="molstemMelding" role="status" aria-live="polite"></div>
+</div>
+
 
   <div class="dashboardKaart">
     <h3>Klassement</h3>

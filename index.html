@@ -594,8 +594,14 @@ profielForm.addEventListener('submit', async (event) => {
       toonMelding('Je bent afgemeld.', 'succes');
     });
 
-    const { data: { session } } = await supabase.auth.getSession();
-    toonIngelogdeGebruiker(session);
+   
+const { data: { session } } = await supabase.auth.getSession();
+toonIngelogdeGebruiker(session);
+
+if (session) {
+  await laadProfiel();
+}
+
 
     supabase.auth.onAuthStateChange((_event, session) => {
       toonIngelogdeGebruiker(session);

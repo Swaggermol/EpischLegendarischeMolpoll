@@ -794,12 +794,14 @@ await laadProfiel();
     
 if (session) {
   await laadProfiel();
+  await laadMolstem();
 }
 
 
     supabase.auth.onAuthStateChange((_event, session) => {
       toonIngelogdeGebruiker(session);
       await laadProfiel();
+      await laadMolstem();
     });
   </script>
 </body>

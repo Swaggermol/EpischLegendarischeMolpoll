@@ -798,11 +798,15 @@ if (session) {
 }
 
 
-    supabase.auth.onAuthStateChange((_event, session) => {
-      toonIngelogdeGebruiker(session);
-      await laadProfiel();
-      await laadMolstem();
-    });
-  </script>
-</body>
-</html>
+    
+supabase.auth.onAuthStateChange((_event, session) => {
+  toonIngelogdeGebruiker(session);
+
+  if (session) {
+    setTimeout(() => {
+      laadProfiel();
+      laadMolstem();
+    }, 0);
+  }
+});
+

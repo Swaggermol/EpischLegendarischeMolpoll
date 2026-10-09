@@ -796,9 +796,8 @@ if (session) {
   await laadProfiel();
   await laadMolstem();
 }
+  
 
-
-    
 supabase.auth.onAuthStateChange((_event, session) => {
   toonIngelogdeGebruiker(session);
 
@@ -809,4 +808,3 @@ supabase.auth.onAuthStateChange((_event, session) => {
     }, 0);
   }
 });
-
